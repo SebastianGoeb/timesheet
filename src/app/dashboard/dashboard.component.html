@@ -1,0 +1,16 @@
+{{calendarView}}
+
+
+<select>
+  <option *ngFor="let view of views">
+    {{view}}
+  </option>
+</select>
+<div *ngFor="let workUnit of workUnits$ | async">
+  <input type="text" [(ngModel)]="workUnit.start">
+  <input type="text" [(ngModel)]="workUnit.end">
+  <input type="text" [(ngModel)]="workUnit.breakDuration">
+</div>
+
+
+<button (click)="addWorkUnit()">Add Work Unit</button>
