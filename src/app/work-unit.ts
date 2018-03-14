@@ -8,7 +8,6 @@ export class WorkUnit {
   public end: Moment;
   public breakDuration: Duration;
 
-
   constructor({id, start, end, breakDuration}) {
     this.id = id;
     this.start = moment(start);

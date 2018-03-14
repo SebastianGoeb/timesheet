@@ -1,16 +1,11 @@
-{{calendarView}}
+<button (click)="decrementMonth()"><</button>
+<button (click)="incrementMonth()">></button>
+{{(currentMonth$ | async).format('MMMM YYYY')}}
 
+<br/>
 
-<select>
-  <option *ngFor="let view of views">
-    {{view}}
-  </option>
-</select>
 <div *ngFor="let workUnit of workUnits$ | async">
-  <input type="text" [(ngModel)]="workUnit.start">
-  <input type="text" [(ngModel)]="workUnit.end">
-  <input type="text" [(ngModel)]="workUnit.breakDuration">
+  <app-work-unit-editor [workUnit]="workUnit"></app-work-unit-editor>
 </div>
-
 
 <button (click)="addWorkUnit()">Add Work Unit</button>

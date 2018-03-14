@@ -10,14 +10,16 @@ import {DashboardComponent} from "./dashboard/dashboard.component";
 
 import * as moment from 'moment';
 import * as momentDurationFormat from 'moment-duration-format';
+import { WorkUnitEditorComponent } from './work-unit-editor/work-unit-editor.component';
+
+// Initialize moment-duration-format
 momentDurationFormat(moment);
-
-
 
 @NgModule({
   declarations: [
     AppComponent,
-    DashboardComponent
+    DashboardComponent,
+    WorkUnitEditorComponent
   ],
   imports: [
     BrowserModule,

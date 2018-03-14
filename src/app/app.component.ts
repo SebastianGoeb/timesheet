@@ -24,11 +24,6 @@ export class AppComponent {
     this.workUnitService.workUnits$
       .subscribe(workUnits => {
         this.workUnitHistory.push(workUnits);
-
-        console.log(this.workUnitHistory);
-        if (this.workUnitHistory.length > 1) {
-          console.log('equal', this.workUnitHistory[this.workUnitHistory.length - 2] === this.workUnitHistory[this.workUnitHistory.length - 1]);
-        }
       });
   }
 
