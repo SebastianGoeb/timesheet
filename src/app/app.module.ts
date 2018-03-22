@@ -1,32 +1,25 @@
 import {BrowserModule} from '@angular/platform-browser';
 import {NgModule} from '@angular/core';
-import {FormsModule} from "@angular/forms";
 
 import {AppComponent} from './app.component';
-import {WorkUnitStore} from "./work-unit.service";
-import {WorkUnitBackendService} from "./work-unit-backend.service";
 import {AppRoutingModule} from "./app-routing.module";
-import {DashboardComponent} from "./dashboard/dashboard.component";
 
 import * as moment from 'moment';
 import * as momentDurationFormat from 'moment-duration-format';
-import { WorkUnitEditorComponent } from './work-unit-editor/work-unit-editor.component';
+import {HistoryModule} from "./history/history.module";
 
 // Initialize moment-duration-format
 momentDurationFormat(moment);
 
 @NgModule({
   declarations: [
-    AppComponent,
-    DashboardComponent,
-    WorkUnitEditorComponent
+    AppComponent
   ],
   imports: [
     BrowserModule,
     AppRoutingModule,
-    FormsModule
+    HistoryModule
   ],
-  providers: [WorkUnitStore, WorkUnitBackendService],
   bootstrap: [AppComponent]
 })
 export class AppModule {

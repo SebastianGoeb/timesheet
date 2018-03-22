@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import {WorkUnit} from "./work-unit";
+import {WorkUnit} from "../../models/work-unit";
 import {Observable} from "rxjs/Observable";
 import {of} from "rxjs/observable/of";
 

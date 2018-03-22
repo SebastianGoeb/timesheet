@@ -1,0 +1,14 @@
+<button (click)="decrementMonth()"><</button>
+<button (click)="incrementMonth()">></button>
+{{(month | async).format('MMMM YYYY')}}
+
+<br/>
+
+<div *ngFor="let workUnit of workUnits | async">
+  {{workUnit.date.startOf('day').format('DD')}}
+  <app-work-unit-editor
+    [startTime]="workUnit.start"
+    [endTime]="workUnit.end"
+    [breakDuration]="workUnit.breakDuration"
+    (update)="log($event)"></app-work-unit-editor>
+</div>
