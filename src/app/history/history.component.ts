@@ -7,6 +7,11 @@ import {BehaviorSubject} from "rxjs/BehaviorSubject";
 import * as moment from "moment";
 import * as _ from "lodash";
 
+class DateInfo {
+  date: moment.Moment;
+  workUnit: WorkUnit;
+}
+
 @Component({
   selector: 'app-history',
   templateUrl: './history.component.html',
@@ -14,43 +19,22 @@ import * as _ from "lodash";
 })
 export class HistoryComponent implements OnInit {
 
-  initialMonth = moment().startOf('month');
-
-  month: BehaviorSubject<moment.Moment>;
-
-  workUnits: Observable<{
-    date: moment.Moment,
-    start: string,
-    end: string,
-    breakDuration: string
-  }[]>;
+  month = new BehaviorSubject<moment.Moment>(moment().startOf('month'));
 
   datesInMonth: Observable<moment.Moment[]>;
 
-  constructor(private workUnitStore: WorkUnitStore) {
-    // Initialize month to current month
-    this.month = new BehaviorSubject(moment().startOf('month'));
+  dateInfos: Observable<DateInfo[]>;
 
+  constructor(private workUnitStore: WorkUnitStore) {
     this.datesInMonth = this.month.pipe(map(month => HistoryComponent.datesInMonth(month)));
 
-    // Make a work unit for each day. If
-    this.workUnits = this.workUnitStore.workUnits$.pipe(
+    // Make a work unit for each date
+    this.dateInfos = this.workUnitStore.workUnits$.pipe(
       combineLatest(this.datesInMonth, (workUnits, datesInMonth) => ({workUnits, datesInMonth})),
       map(({workUnits, datesInMonth}) => {
         return datesInMonth.map(date => {
-          const workUnit: WorkUnit = workUnits.find(workUnit => {
-            return workUnit.start.startOf('day').isSame(date);
-          });
-          if (workUnit) {
-            return {
-              date,
-              start: workUnit.start.format('hh:mm'),
-              end: workUnit.end.format('hh:mm'),
-              breakDuration: '' + workUnit.breakDuration
-            }
-          } else {
-            return {date, start: '', end: '', breakDuration: ''}
-          }
+          const workUnit = workUnits.find(workUnit => workUnit.start.startOf('day').isSame(date));
+          return {date, workUnit};
         });
       })
     );
@@ -64,11 +48,15 @@ export class HistoryComponent implements OnInit {
     return _.range(0, days).map(n => moment(startDate).add(n, 'days'))
   }
 
-  log(event: { startTime, endTime, breakDuration }) {
-    console.log(event);
+  ngOnInit() {
   }
 
-  ngOnInit() {
+  onUpdate(previousWorkUnit: WorkUnit, workUnit: WorkUnit) {
+    if (previousWorkUnit) {
+      this.workUnitStore.updateWorkUnit(workUnit);
+    } else {
+      this.workUnitStore.addWorkUnit(workUnit);
+    }
   }
 
   updateMonth($event: moment.Moment) {

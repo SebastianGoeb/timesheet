@@ -1,12 +1,10 @@
-<app-month-selector [initialMonth]="initialMonth" (update)="updateMonth($event)"></app-month-selector>
+<app-month-selector [initialMonth]="month.getValue()" (update)="updateMonth($event)"></app-month-selector>
 
 <br/>
 
-<div *ngFor="let workUnit of workUnits | async">
-  {{workUnit.date.startOf('day').format('DD')}}
+<div *ngFor="let dateInfo of dateInfos | async">
   <app-work-unit-editor
-    [startTime]="workUnit.start"
-    [endTime]="workUnit.end"
-    [breakDuration]="workUnit.breakDuration"
-    (update)="log($event)"></app-work-unit-editor>
+    [date]="dateInfo.date"
+    [workUnit]="dateInfo.workUnit"
+    (update)="onUpdate(dateInfo.workUnit, $event);"></app-work-unit-editor>
 </div>
