@@ -5,11 +5,13 @@ import {WorkUnitStore} from "../shared/services/work-unit/work-unit.store";
 import {WorkUnitBackendService} from "../shared/services/work-unit/work-unit-backend.service";
 import {FormsModule} from "@angular/forms";
 import {WorkUnitEditorComponent} from "./work-unit-editor/work-unit-editor.component";
+import { MonthSelectorComponent } from './month-selector/month-selector.component';
 
 @NgModule({
   declarations: [
     HistoryComponent,
-    WorkUnitEditorComponent
+    WorkUnitEditorComponent,
+    MonthSelectorComponent
   ],
   imports: [
     CommonModule,

@@ -1,6 +1,4 @@
-<button (click)="decrementMonth()"><</button>
-<button (click)="incrementMonth()">></button>
-{{(month | async).format('MMMM YYYY')}}
+<app-month-selector [initialMonth]="initialMonth" (update)="updateMonth($event)"></app-month-selector>
 
 <br/>
 

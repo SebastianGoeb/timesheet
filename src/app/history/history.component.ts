@@ -14,6 +14,8 @@ import * as _ from "lodash";
 })
 export class HistoryComponent implements OnInit {
 
+  initialMonth = moment().startOf('month');
+
   month: BehaviorSubject<moment.Moment>;
 
   workUnits: Observable<{
@@ -62,18 +64,14 @@ export class HistoryComponent implements OnInit {
     return _.range(0, days).map(n => moment(startDate).add(n, 'days'))
   }
 
+  log(event: { startTime, endTime, breakDuration }) {
+    console.log(event);
+  }
+
   ngOnInit() {
   }
 
-  incrementMonth() {
-    this.month.next(this.month.getValue().add(1, 'month'));
-  }
-
-  decrementMonth() {
-    this.month.next(this.month.getValue().subtract(1, 'month'));
-  }
-
-  log(event: { startTime, endTime, breakDuration }) {
-    console.log(event);
+  updateMonth($event: moment.Moment) {
+    this.month.next($event);
   }
 }
