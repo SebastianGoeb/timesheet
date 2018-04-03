@@ -3,7 +3,7 @@ import {WorkUnit} from "../../models/work-unit";
 import {Observable} from "rxjs/Observable";
 import {of} from "rxjs/observable/of";
 
-const KEY_WORK_UNITS = "dateInfos";
+const KEY_WORK_UNITS = "workUnits";
 const DEFAULT_WORK_UNITS = [];
 
 @Injectable()
@@ -41,7 +41,7 @@ export class WorkUnitBackendService {
   updateWorkUnit(newWorkUnit: WorkUnit): Observable<WorkUnit[]> {
     const workUnits: WorkUnit[] = WorkUnitBackendService.readFromLocalStorage()
       .map(w => {
-        if (w.start.startOf('day').isSame(newWorkUnit.start.startOf('day'))) {
+        if (w.date.isSame(newWorkUnit.date)) {
           return newWorkUnit;
         } else {
           return w;

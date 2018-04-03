@@ -1,5 +1,5 @@
 import {Component, OnInit} from '@angular/core';
-import {combineLatest, map} from "rxjs/operators";
+import {combineLatest, map, tap} from "rxjs/operators";
 import {WorkUnit} from "../shared/models/work-unit";
 import {Observable} from "rxjs/Observable";
 import {WorkUnitStore} from "../shared/services/work-unit/work-unit.store";
@@ -33,9 +33,14 @@ export class HistoryComponent implements OnInit {
       combineLatest(this.datesInMonth, (workUnits, datesInMonth) => ({workUnits, datesInMonth})),
       map(({workUnits, datesInMonth}) => {
         return datesInMonth.map(date => {
-          const workUnit = workUnits.find(workUnit => workUnit.start.startOf('day').isSame(date));
-          return {date, workUnit};
+          const workUnit = workUnits.find(workUnit => workUnit.date.isSame(date));
+          return {date, workUnit: workUnit || {date}};
         });
+      }),
+      tap((dateInfos: DateInfo[]) => {
+        for (let dateInfo of dateInfos) {
+          console.log(dateInfo.date.format(), dateInfo.workUnit);
+        }
       })
     );
   }
@@ -52,10 +57,12 @@ export class HistoryComponent implements OnInit {
   }
 
   onUpdate(previousWorkUnit: WorkUnit, workUnit: WorkUnit) {
-    if (previousWorkUnit) {
-      this.workUnitStore.updateWorkUnit(workUnit);
-    } else {
-      this.workUnitStore.addWorkUnit(workUnit);
+    if (workUnit.start || workUnit.end || workUnit.breakDuration) {
+      if (previousWorkUnit.start || previousWorkUnit.end || previousWorkUnit.breakDuration) {
+        this.workUnitStore.updateWorkUnit(workUnit);
+      } else {
+        this.workUnitStore.addWorkUnit(workUnit);
+      }
     }
   }
 

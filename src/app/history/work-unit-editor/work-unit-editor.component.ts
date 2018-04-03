@@ -51,25 +51,23 @@ export class WorkUnitEditorComponent implements OnInit, OnChanges {
   }
 
   ngOnChanges(changes: SimpleChanges) {
-    const date = changes.date.currentValue;
     const workUnit: WorkUnit = changes.workUnit.currentValue;
 
-    this.date = moment(date).startOf('date');
+    console.log(workUnit.date.format(), workUnit);
 
-    this.startTime = workUnit && workUnit.start ? workUnit.start.format('hh:mm') : '';
-    this.endTime = workUnit && workUnit.end ? workUnit.end.format('hh:mm') : '';
-    this.breakTime = workUnit && workUnit.breakDuration ? workUnit.breakDuration.format('hh:mm') : '';
+    this.date = moment(workUnit.date);
+
+    this.startTime = workUnit.start ? workUnit.start.format('hh:mm') : '';
+    this.endTime = workUnit.end ? workUnit.end.format('hh:mm') : '';
+    this.breakTime = workUnit.breakDuration ? workUnit.breakDuration.format('hh:mm') : '';
   }
 
   onInput() {
+    const date = moment(this.date);
     const start = WorkUnitEditorComponent.buildMoment(this.date, this.startTime);
     const end = WorkUnitEditorComponent.buildMoment(this.date, this.endTime);
     const breakDuration = WorkUnitEditorComponent.buildDuration(this.breakTime);
 
-    if (!start && !end && !breakDuration) {
-      this.update.emit(null);
-    } else {
-      this.update.emit({start, end, breakDuration});
-    }
+    this.update.emit({date, start, end, breakDuration});
   }
 }
