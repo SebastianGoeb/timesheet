@@ -53,8 +53,6 @@ export class WorkUnitEditorComponent implements OnInit, OnChanges {
   ngOnChanges(changes: SimpleChanges) {
     const workUnit: WorkUnit = changes.workUnit.currentValue;
 
-    console.log(workUnit.date.format(), workUnit);
-
     this.date = moment(workUnit.date);
 
     this.startTime = workUnit.start ? workUnit.start.format('HH:mm') : '';
