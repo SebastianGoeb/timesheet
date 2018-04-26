@@ -20,11 +20,12 @@ export class WorkUnitBackendService {
     }
 
     return JSON.parse(value)
-      .map(workUnit => new WorkUnit(workUnit));
+      .map(workUnit => WorkUnit.fromJson(workUnit));
   }
 
   private static writeToLocalStorage(workUnits: WorkUnit[]): void {
-    localStorage.setItem(KEY_WORK_UNITS, JSON.stringify(workUnits));
+    localStorage.setItem(KEY_WORK_UNITS, JSON.stringify(workUnits
+      .map(workUnit => WorkUnit.toJson(workUnit))));
   }
 
   getAll(): WorkUnit[] {
