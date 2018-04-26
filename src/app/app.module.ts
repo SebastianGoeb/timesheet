@@ -1,20 +1,23 @@
 import {BrowserModule} from '@angular/platform-browser';
 import {NgModule} from '@angular/core';
 
-
 import {AppComponent} from './app.component';
-import {WorkUnitStore} from "./work-unit.service";
-import {WorkUnitBackendService} from "./work-unit-backend.service";
+import {AppRoutingModule} from "./app-routing.module";
 
+import 'moment';
+import 'moment-duration-format'; // Important: must be after import 'moment'!
+
+import {HistoryModule} from "./history/history.module";
 
 @NgModule({
   declarations: [
     AppComponent
   ],
   imports: [
-    BrowserModule
+    BrowserModule,
+    AppRoutingModule,
+    HistoryModule
   ],
-  providers: [WorkUnitStore, WorkUnitBackendService],
   bootstrap: [AppComponent]
 })
 export class AppModule {

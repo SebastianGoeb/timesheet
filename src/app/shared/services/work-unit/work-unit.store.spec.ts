@@ -1,6 +1,6 @@
 import { TestBed, inject } from '@angular/core/testing';
 
-import { WorkUnitStore } from './work-unit.service';
+import { WorkUnitStore } from './work-unit.store';
 
 describe('WorkUnitStore', () => {
   beforeEach(() => {

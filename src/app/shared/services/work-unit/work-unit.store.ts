@@ -1,5 +1,5 @@
 import {Injectable} from '@angular/core';
-import {WorkUnit} from "./work-unit";
+import {WorkUnit} from "../../models/work-unit";
 
 import {BehaviorSubject} from "rxjs/BehaviorSubject";
 import {Observable} from "rxjs/Observable";
@@ -18,7 +18,7 @@ export class WorkUnitStore {
   }
 
   public addWorkUnit(newWorkUnit: WorkUnit): Observable<WorkUnit> {
-    let obs: Observable<WorkUnit> = this.workUnitBackendService.saveWorkUnit(newWorkUnit);
+    let obs: Observable<WorkUnit> = this.workUnitBackendService.addWorkUnit(newWorkUnit);
 
     obs.subscribe(res => {
       this._workUnits$.getValue().push(newWorkUnit);
@@ -26,5 +26,13 @@ export class WorkUnitStore {
     });
 
     return obs;
+  }
+
+  public updateWorkUnit(newWorkUnit: WorkUnit) {
+    let obs: Observable<WorkUnit[]> = this.workUnitBackendService.updateWorkUnit(newWorkUnit);
+
+    obs.subscribe(res => {
+      this._workUnits$.next(res);
+    })
   }
 }
