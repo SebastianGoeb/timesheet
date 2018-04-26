@@ -1,0 +1,10 @@
+<app-month-selector [initialMonth]="month.getValue()" (update)="updateMonth($event)"></app-month-selector>
+
+<br/>
+
+<div *ngFor="let dateInfo of dateInfos | async">
+  <app-work-unit-editor
+    [date]="dateInfo.date"
+    [workUnit]="dateInfo.workUnit"
+    (update)="onUpdate(dateInfo.workUnit, $event);"></app-work-unit-editor>
+</div>
