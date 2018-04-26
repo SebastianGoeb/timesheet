@@ -57,9 +57,9 @@ export class WorkUnitEditorComponent implements OnInit, OnChanges {
 
     this.date = moment(workUnit.date);
 
-    this.startTime = workUnit.start ? workUnit.start.format('hh:mm') : '';
-    this.endTime = workUnit.end ? workUnit.end.format('hh:mm') : '';
-    this.breakTime = workUnit.breakDuration ? workUnit.breakDuration.format('hh:mm') : '';
+    this.startTime = workUnit.start ? workUnit.start.format('HH:mm') : '';
+    this.endTime = workUnit.end ? workUnit.end.format('HH:mm') : '';
+    this.breakTime = workUnit.breakDuration ? workUnit.breakDuration.format('HH:mm') : '';
   }
 
   onInput() {
