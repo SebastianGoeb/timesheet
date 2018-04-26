@@ -3,7 +3,7 @@
 <br/>
 
 <div *ngFor="let dateInfo of dateInfos | async">
-  {{dateInfo.workUnit.date.format('D')}}
+  {{dateInfo.date.format('DD')}}
   <app-work-unit-editor
     [date]="dateInfo.date"
     [workUnit]="dateInfo.workUnit"
