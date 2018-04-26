@@ -1,5 +1,5 @@
 import {Component, OnInit} from '@angular/core';
-import {combineLatest, map, tap} from "rxjs/operators";
+import {combineLatest, map} from "rxjs/operators";
 import {WorkUnit} from "../shared/models/work-unit";
 import {Observable} from "rxjs/Observable";
 import {WorkUnitStore} from "../shared/services/work-unit/work-unit.store";
@@ -28,19 +28,17 @@ export class HistoryComponent implements OnInit {
   constructor(private workUnitStore: WorkUnitStore) {
     this.datesInMonth = this.month.pipe(map(month => HistoryComponent.datesInMonth(month)));
 
-    // Make a work unit for each date
+    // Display an empty work unit for each date that doesn't have a work unit persisted
     this.dateInfos = this.workUnitStore.workUnits$.pipe(
       combineLatest(this.datesInMonth, (workUnits, datesInMonth) => ({workUnits, datesInMonth})),
       map(({workUnits, datesInMonth}) => {
         return datesInMonth.map(date => {
           const workUnit = workUnits.find(workUnit => workUnit.date.isSame(date));
-          return {date, workUnit: workUnit || {date}};
+          return {
+            date,
+            workUnit: workUnit || {date, start: null, end: null, breakDuration: null}
+          };
         });
-      }),
-      tap((dateInfos: DateInfo[]) => {
-        for (let dateInfo of dateInfos) {
-          console.log(dateInfo.date.format(), dateInfo.workUnit);
-        }
       })
     );
   }
