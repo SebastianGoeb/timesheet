@@ -1,5 +1,6 @@
 import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
 import * as moment from "moment";
+import {DateTimeFormatter, LocalDate} from 'js-joda';
 
 @Component({
   selector: 'app-month-selector',
@@ -8,26 +9,30 @@ import * as moment from "moment";
 })
 export class MonthSelectorComponent implements OnInit {
 
-  @Input('initialMonth') initialMonth: moment.Moment;
+  monthFormat = DateTimeFormatter.ofPattern('MM/yyyy');
 
-  @Output('update') month = new EventEmitter<moment.Moment>();
+  @Input('initialMonth')
+  initialMonth: LocalDate;
 
-  _month: moment.Moment;
+  @Output('monthChange')
+  monthChange = new EventEmitter<LocalDate>();
+
+  _month: LocalDate;
 
   constructor() {
   }
 
   ngOnInit() {
-    this._month = moment(this.initialMonth).startOf('month');
+    this._month = this.initialMonth.withDayOfMonth(1);
   }
 
   incrementMonth() {
-    this._month = moment(this._month).add(1, 'month');
-    this.month.emit(this._month);
+    this._month = this._month.plusMonths(1);
+    this.monthChange.emit(this._month);
   }
 
   decrementMonth() {
-    this._month = moment(this._month).subtract(1, 'month');
-    this.month.emit(this._month);
+    this._month = this._month.minusMonths(1);
+    this.monthChange.emit(this._month);
   }
 }

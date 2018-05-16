@@ -1,5 +1,5 @@
 <h4 *ngIf="_month">
-  {{(_month).format('MMMM YYYY')}}
+  {{(_month).format(monthFormat)}}
 </h4>
 <button (click)="decrementMonth()"><</button>
 <button (click)="incrementMonth()">></button>

@@ -1,11 +1,11 @@
 import {NgModule} from '@angular/core';
 import {CommonModule} from '@angular/common';
 import {HistoryComponent} from './history.component';
-import {WorkUnitStore} from "../shared/services/work-unit/work-unit.store";
-import {WorkUnitBackendService} from "../shared/services/work-unit/work-unit-backend.service";
-import {FormsModule} from "@angular/forms";
-import {WorkUnitEditorComponent} from "./work-unit-editor/work-unit-editor.component";
-import { MonthSelectorComponent } from './month-selector/month-selector.component';
+import {WorkDayStore} from '../shared/services/work-unit/work-day.store';
+import {WorkDayService} from '../shared/services/work-unit/work-day.service';
+import {FormsModule, ReactiveFormsModule} from '@angular/forms';
+import {WorkUnitEditorComponent} from './work-unit-editor/work-unit-editor.component';
+import {MonthSelectorComponent} from './month-selector/month-selector.component';
 
 @NgModule({
   declarations: [
@@ -15,9 +15,13 @@ import { MonthSelectorComponent } from './month-selector/month-selector.componen
   ],
   imports: [
     CommonModule,
-    FormsModule
+    FormsModule,
+    ReactiveFormsModule
   ],
-  providers: [WorkUnitStore, WorkUnitBackendService]
+  providers: [
+    WorkDayStore,
+    WorkDayService
+  ]
 })
 export class HistoryModule {
 }

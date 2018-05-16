@@ -1,71 +1,129 @@
-import {Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges} from '@angular/core';
-import * as moment from "moment";
-import {WorkUnit} from "../../shared/models/work-unit";
+import {Component, EventEmitter, Input, OnChanges, OnDestroy, Output} from '@angular/core';
+import {AbstractControl, FormBuilder, FormGroup, ValidatorFn} from '@angular/forms';
+import {Subscription} from 'rxjs/Subscription';
+import {DateTimeFormatter, LocalTime} from 'js-joda';
+
+import {WorkUnit} from '../../shared/models/work-unit';
+
+class StringifiedWorkUnit {
+  startTime = '';
+  endTime = '';
+  breakTime = '';
+}
 
 @Component({
   selector: 'app-work-unit-editor',
   templateUrl: './work-unit-editor.component.html',
-  styleUrls: ['./work-unit-editor.component.css']
+  styleUrls: ['./work-unit-editor.component.scss']
 })
-export class WorkUnitEditorComponent implements OnInit, OnChanges {
+export class WorkUnitEditorComponent implements OnChanges, OnDestroy {
 
-  @Input("date") date: moment.Moment;
+  private static readonly TIME_FORMATTER = DateTimeFormatter.ofPattern('HH:mm');
 
-  @Input("workUnit") workUnit: WorkUnit;
+  // Data model
+  @Input('workUnit')
+  workUnit: WorkUnit;
 
-  @Output('update') update = new EventEmitter<WorkUnit>();
+  // Contains view model
+  form: FormGroup;
 
-  startTime: string;
-  endTime: string;
-  breakTime: string;
+  // Push view model changes to outside
+  @Output('workUnitChange')
+  workUnitChange = new EventEmitter<WorkUnit>();
 
-  constructor() {
-  }
+  // Avoid memory leaks. Clean up long-running subscriptions
+  formChangeSubscription: Subscription;
 
-  private static buildMoment(date: moment.Moment, time: string): moment.Moment {
-    if (time === '') {
-      return null;
-    }
+  constructor(private fb: FormBuilder) {
+    // From setup
+    this.form = this.fb.group({
+      startTime: ['', WorkUnitEditorComponent.invalidTimeValidator()],
+      endTime: ['', WorkUnitEditorComponent.invalidTimeValidator()],
+      breakTime: ['', WorkUnitEditorComponent.invalidTimeValidator()]
+    });
 
-    const parsed = moment(time, 'hh:mm');
-
-    return moment(date)
-      .hour(parsed.hour())
-      .minute(parsed.minute());
-  }
-
-  private static buildDuration(time: string): moment.Duration {
-    if (time === '') {
-      return null;
-    }
-
-    const parsed = moment(time, 'hh:mm');
-
-    return moment.duration({
-      hour: parsed.hour(),
-      minute: parsed.minute()
+    // Push model changes to outside
+    this.formChangeSubscription = this.form.valueChanges.subscribe(viewModel => {
+      if (this.form.status === 'VALID') {
+        const newWorkUnit = WorkUnitEditorComponent.buildDataModel(viewModel);
+        this.workUnitChange.emit(newWorkUnit);
+      }
     });
   }
 
-  ngOnInit() {
+  get startTime() {
+    return this.form.get('startTime');
   }
 
-  ngOnChanges(changes: SimpleChanges) {
-    const workUnit: WorkUnit = changes.workUnit.currentValue;
-
-    this.date = moment(workUnit.date);
-
-    this.startTime = workUnit.start ? workUnit.start.format('HH:mm') : '';
-    this.endTime = workUnit.end ? workUnit.end.format('HH:mm') : '';
-    this.breakTime = workUnit.breakDuration ? workUnit.breakDuration.format('HH:mm') : '';
+  get endTime() {
+    return this.form.get('endTime');
   }
 
-  onInput() {
-    const date = moment(this.date);
-    const start = WorkUnitEditorComponent.buildMoment(this.date, this.startTime);
-    const end = WorkUnitEditorComponent.buildMoment(this.date, this.endTime);
-    const breakDuration = WorkUnitEditorComponent.buildDuration(this.breakTime);
+  get breakTime() {
+    return this.form.get('breakTime');
+  }
 
-    this.update.emit({date, start, end, breakDuration});
+  private static invalidTimeValidator(): ValidatorFn {
+    return (control: AbstractControl): { [key: string]: any } => {
+      if (control.value === '') {
+        return null;
+      }
+
+      try {
+        LocalTime.parse(control.value, this.TIME_FORMATTER);
+        return null;
+      } catch (e) {
+        return {invalidTime: {value: control.value}};
+      }
+    };
+  }
+
+  private static buildViewModel(workUnit: WorkUnit = new WorkUnit()): StringifiedWorkUnit {
+    if (!workUnit) {
+      return new StringifiedWorkUnit();
+    }
+    return {
+      startTime: this.safeFormatLocalTime(workUnit.startTime),
+      endTime: this.safeFormatLocalTime(workUnit.endTime),
+      breakTime: this.safeFormatLocalTime(workUnit.breakTime)
+    };
+  }
+
+  private static buildDataModel({startTime, endTime, breakTime}: StringifiedWorkUnit): WorkUnit {
+    let result = {
+      startTime: this.safeParseLocalTime(startTime),
+      endTime: this.safeParseLocalTime(endTime),
+      breakTime: this.safeParseLocalTime(breakTime)
+    };
+    if (!result.startTime && !result.endTime && !result.breakTime) {
+      return null;
+    }
+    return result;
+  }
+
+  private static safeFormatLocalTime(startTime: LocalTime) {
+    try {
+      return startTime.format(this.TIME_FORMATTER);
+    } catch (e) {
+      return ''; // default
+    }
+  }
+
+  private static safeParseLocalTime(string: string): LocalTime {
+    try {
+      return LocalTime.parse(string, this.TIME_FORMATTER);
+    } catch (e) {
+      return null; // default
+    }
+  }
+
+  // Data model changes
+  ngOnChanges(changes) {
+    this.form.setValue(WorkUnitEditorComponent.buildViewModel(this.workUnit));
+  }
+
+  // Cleanup observables
+  ngOnDestroy() {
+    this.formChangeSubscription.unsubscribe();
   }
 }
