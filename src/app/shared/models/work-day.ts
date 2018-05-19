@@ -1,24 +1,34 @@
-import {DateTimeFormatter, LocalDate} from 'js-joda';
+import {LocalDate} from 'js-joda';
 import {WorkUnit} from './work-unit';
+import {safeFormatLocalDate, safeParseLocalDate} from '../utils/date-time-utils';
 
 export class WorkDay {
-  date: LocalDate;
-  workUnit: WorkUnit;
+  date: LocalDate = null;
+  workUnit: WorkUnit = null;
 
-  constructor(arg: { date: string, workUnit: { startTime: string, endTime: string, breakTime: string } } | LocalDate) {
-    if (arg instanceof LocalDate) {
-      this.date = arg;
-      this.workUnit = null;
-    } else {
-      this.date = LocalDate.parse(arg.date);
-      this.workUnit = new WorkUnit(arg.workUnit);
+  public static fromJSON(json: any): WorkDay {
+    if (!json) {
+      return null;
     }
+
+    return {
+      date: safeParseLocalDate(json.date),
+      workUnit: WorkUnit.fromJSON(json.workUnit)
+    };
   }
 
   public static toJSON(workDay: WorkDay) {
+    if (!workDay) {
+      return null;
+    }
+
     return {
-      date: workDay.date.format(DateTimeFormatter.ISO_LOCAL_DATE),
+      date: safeFormatLocalDate(workDay.date),
       workUnit: WorkUnit.toJSON(workDay.workUnit)
     };
+  }
+
+  static ofDate(date: LocalDate) {
+    return Object.assign(new WorkDay(), {date});
   }
 }

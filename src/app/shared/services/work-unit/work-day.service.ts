@@ -21,7 +21,7 @@ export class WorkDayService {
     }
 
     return JSON.parse(jsonString)
-      .map(json => new WorkDay(json));
+      .map(json => WorkDay.fromJSON(json));
   }
 
   private static writeToLocalStorage(workDays: WorkDay[]): void {

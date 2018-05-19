@@ -1,5 +1,4 @@
 import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
-import * as moment from "moment";
 import {DateTimeFormatter, LocalDate} from 'js-joda';
 
 @Component({

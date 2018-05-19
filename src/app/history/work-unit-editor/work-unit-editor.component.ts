@@ -4,6 +4,7 @@ import {Subscription} from 'rxjs/Subscription';
 import {DateTimeFormatter, LocalTime} from 'js-joda';
 
 import {WorkUnit} from '../../shared/models/work-unit';
+import {safeFormatLocalTime, safeParseLocalTime} from '../../shared/utils/date-time-utils';
 
 class StringifiedWorkUnit {
   startTime = '';
@@ -18,7 +19,7 @@ class StringifiedWorkUnit {
 })
 export class WorkUnitEditorComponent implements OnChanges, OnDestroy {
 
-  private static readonly TIME_FORMATTER = DateTimeFormatter.ofPattern('HH:mm');
+  private static readonly FORM_24_HOUR_LOCAL_TIME = DateTimeFormatter.ofPattern('HH:mm');
 
   // Data model
   @Input('workUnit')
@@ -45,8 +46,7 @@ export class WorkUnitEditorComponent implements OnChanges, OnDestroy {
     // Push model changes to outside
     this.formChangeSubscription = this.form.valueChanges.subscribe(viewModel => {
       if (this.form.status === 'VALID') {
-        const newWorkUnit = WorkUnitEditorComponent.buildDataModel(viewModel);
-        this.workUnitChange.emit(newWorkUnit);
+        this.workUnitChange.emit(WorkUnitEditorComponent.buildDataModel(viewModel));
       }
     });
   }
@@ -70,7 +70,7 @@ export class WorkUnitEditorComponent implements OnChanges, OnDestroy {
       }
 
       try {
-        LocalTime.parse(control.value, this.TIME_FORMATTER);
+        LocalTime.parse(control.value, this.FORM_24_HOUR_LOCAL_TIME);
         return null;
       } catch (e) {
         return {invalidTime: {value: control.value}};
@@ -78,43 +78,34 @@ export class WorkUnitEditorComponent implements OnChanges, OnDestroy {
     };
   }
 
-  private static buildViewModel(workUnit: WorkUnit = new WorkUnit()): StringifiedWorkUnit {
-    if (!workUnit) {
+  private static buildViewModel(dataModel: WorkUnit): StringifiedWorkUnit {
+    if (!dataModel) {
       return new StringifiedWorkUnit();
     }
+
     return {
-      startTime: this.safeFormatLocalTime(workUnit.startTime),
-      endTime: this.safeFormatLocalTime(workUnit.endTime),
-      breakTime: this.safeFormatLocalTime(workUnit.breakTime)
+      startTime: safeFormatLocalTime(dataModel.startTime, this.FORM_24_HOUR_LOCAL_TIME),
+      endTime: safeFormatLocalTime(dataModel.endTime, this.FORM_24_HOUR_LOCAL_TIME),
+      breakTime: safeFormatLocalTime(dataModel.breakTime, this.FORM_24_HOUR_LOCAL_TIME)
     };
   }
 
-  private static buildDataModel({startTime, endTime, breakTime}: StringifiedWorkUnit): WorkUnit {
-    let result = {
-      startTime: this.safeParseLocalTime(startTime),
-      endTime: this.safeParseLocalTime(endTime),
-      breakTime: this.safeParseLocalTime(breakTime)
+  private static buildDataModel(viewModel: StringifiedWorkUnit): WorkUnit {
+    if (!viewModel) {
+      return null;
+    }
+
+    const result = {
+      startTime: safeParseLocalTime(viewModel.startTime, this.FORM_24_HOUR_LOCAL_TIME),
+      endTime: safeParseLocalTime(viewModel.endTime, this.FORM_24_HOUR_LOCAL_TIME),
+      breakTime: safeParseLocalTime(viewModel.breakTime, this.FORM_24_HOUR_LOCAL_TIME)
     };
+
     if (!result.startTime && !result.endTime && !result.breakTime) {
       return null;
     }
+
     return result;
-  }
-
-  private static safeFormatLocalTime(startTime: LocalTime) {
-    try {
-      return startTime.format(this.TIME_FORMATTER);
-    } catch (e) {
-      return ''; // default
-    }
-  }
-
-  private static safeParseLocalTime(string: string): LocalTime {
-    try {
-      return LocalTime.parse(string, this.TIME_FORMATTER);
-    } catch (e) {
-      return null; // default
-    }
   }
 
   // Data model changes

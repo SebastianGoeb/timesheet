@@ -6,5 +6,6 @@
 
 <div *ngFor="let workDay of workDaysInMonth">
   {{workDay.date.dayOfMonth()}}:
-  <app-work-unit-editor [workUnit]="workDay.workUnit" (workUnitChange)="workUnitChange(workDay, $event)"></app-work-unit-editor>
+  <app-work-unit-editor [workUnit]="workDay.workUnit"
+                        (workUnitChange)="workUnitChange(workDay, $event)"></app-work-unit-editor>
 </div>

@@ -1,6 +1,6 @@
 import {Component} from '@angular/core';
 import {range} from 'lodash';
-import {ChronoField, LocalDate, LocalTime} from 'js-joda';
+import {ChronoField, LocalDate} from 'js-joda';
 import {WorkDayStore} from '../shared/services/work-unit/work-day.store';
 import {WorkUnit} from '../shared/models/work-unit';
 import {WorkDay} from '../shared/models/work-day';
@@ -29,10 +29,6 @@ export class HistoryComponent {
     // Data model update
   }
 
-  private static equals(t0: LocalTime, t1: LocalTime): boolean {
-    return t0 === t1 || (t0 && t0.equals(t1));
-  }
-
   private static datesInMonth(month: LocalDate): LocalDate[] {
     const daysOfMonth = month.range(ChronoField.DAY_OF_MONTH);
     return range(daysOfMonth.minimum(), daysOfMonth.maximum() + 1)
@@ -42,7 +38,7 @@ export class HistoryComponent {
   private static workDaysInMonth(month: LocalDate, allWorkDays: WorkDay[]): WorkDay[] {
     const datesInMonth = HistoryComponent.datesInMonth(month);
     return datesInMonth.map(date => {
-      return allWorkDays.find(workDay => workDay.date.isEqual(date)) || new WorkDay(date);
+      return allWorkDays.find(workDay => workDay.date.isEqual(date)) || WorkDay.ofDate(date);
     });
   }
 

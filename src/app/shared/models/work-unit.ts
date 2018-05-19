@@ -1,4 +1,5 @@
 import {LocalTime} from 'js-joda';
+import {safeFormatLocalTime, safeParseLocalTime} from '../utils/date-time-utils';
 
 export class WorkUnit {
 
@@ -6,37 +7,27 @@ export class WorkUnit {
   public endTime: LocalTime = null;
   public breakTime: LocalTime = null;
 
-  constructor(arg: { startTime: string, endTime: string, breakTime: string } = {
-    startTime: null,
-    endTime: null,
-    breakTime: null
-  }) {
-    this.startTime = WorkUnit.safeParseLocalTime(arg.startTime);
-    this.endTime = WorkUnit.safeParseLocalTime(arg.endTime);
-    this.breakTime = WorkUnit.safeParseLocalTime(arg.breakTime);
-  }
+  static fromJSON(workUnit: any): WorkUnit {
+    if (!workUnit) {
+      return null;
+    }
 
-  public static toJSON(workUnit: WorkUnit) {
     return {
-      startTime: WorkUnit.safeFormatLocalTime(workUnit.startTime),
-      endTime: WorkUnit.safeFormatLocalTime(workUnit.endTime),
-      breakTime: WorkUnit.safeFormatLocalTime(workUnit.breakTime)
+      startTime: safeParseLocalTime(workUnit.startTime),
+      endTime: safeParseLocalTime(workUnit.endTime),
+      breakTime: safeParseLocalTime(workUnit.breakTime)
     };
   }
 
-  private static safeFormatLocalTime(startTime: LocalTime) {
-    try {
-      return startTime.toString();
-    } catch (e) {
-      return null; // default
+  public static toJSON(workUnit: WorkUnit) {
+    if (!workUnit) {
+      return null;
     }
-  }
 
-  private static safeParseLocalTime(string: string): LocalTime {
-    try {
-      return LocalTime.parse(string);
-    } catch (e) {
-      return null; // default
-    }
+    return {
+      startTime: safeFormatLocalTime(workUnit.startTime),
+      endTime: safeFormatLocalTime(workUnit.endTime),
+      breakTime: safeFormatLocalTime(workUnit.breakTime)
+    };
   }
 }

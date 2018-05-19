@@ -1,6 +1,6 @@
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import {async, ComponentFixture, TestBed} from '@angular/core/testing';
 
-import { WorkUnitEditorComponent } from './work-unit-editor.component';
+import {WorkUnitEditorComponent} from './work-unit-editor.component';
 
 describe('WorkUnitEditorComponent', () => {
   let component: WorkUnitEditorComponent;
@@ -8,9 +8,9 @@ describe('WorkUnitEditorComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ WorkUnitEditorComponent ]
+      declarations: [WorkUnitEditorComponent]
     })
-    .compileComponents();
+      .compileComponents();
   }));
 
   beforeEach(() => {
