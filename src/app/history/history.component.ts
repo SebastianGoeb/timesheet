@@ -14,19 +14,11 @@ import {WorkDay} from '../shared/models/work-day';
 export class HistoryComponent {
 
   // Data model
-  // allWorkUnits: WorkUnit[];
-
-  // View model
   month: LocalDate;
   workDaysInMonth: WorkDay[];
 
   constructor(private workDayStore: WorkDayStore) {
-    // Initial setup
-    // this.allWorkUnits = [];
-
     this.monthChange(LocalDate.now().withDayOfMonth(1));
-
-    // Data model update
   }
 
   private static datesInMonth(month: LocalDate): LocalDate[] {
@@ -55,11 +47,9 @@ export class HistoryComponent {
 
     if (newWorkUnit) {
       if (existingWorkUnit) {
-        console.log('updating work unit', JSON.stringify(existingWorkUnit, null, 2), 'to', JSON.stringify(newWorkUnit, null, 2));
         const newWorkDay = {date: existingWorkDay.date, workUnit: newWorkUnit};
         this.workDayStore.updateWorkDay(newWorkDay);
       } else {
-        console.log('adding work unit', JSON.stringify(newWorkUnit, null, 2));
         const newWorkDay = {date: existingWorkDay.date, workUnit: newWorkUnit};
         this.workDayStore.addWorkDay(newWorkDay);
       }

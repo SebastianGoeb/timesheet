@@ -31,8 +31,6 @@
     "express": "^4.16.2",
     "js-joda": "^1.8.2",
     "lodash": "^4.17.5",
-    "moment": "^2.21.0",
-    "moment-duration-format": "^2.2.2",
     "rxjs": "^5.5.2",
     "typescript": "2.6.x",
     "zone.js": "^0.8.14"
