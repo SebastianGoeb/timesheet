@@ -4,8 +4,8 @@
 
 <!--<app-work-unit-editor [date]="date" [workUnit]="workUnit" (workUnitChange)="workUnitChange($event)"></app-work-unit-editor>-->
 
-<div *ngFor="let workDay of workDaysInMonth">
-  {{workDay.date.dayOfMonth()}}:
+<div *ngFor="let workDay of workDaysInMonth" class="history-row">
+  <span class="day-of-month">{{workDay.date.dayOfMonth()}}:</span>
   <app-work-unit-editor [workUnit]="workDay.workUnit"
                         (workUnitChange)="workUnitChange(workDay, $event)"></app-work-unit-editor>
 </div>

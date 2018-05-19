@@ -9,7 +9,7 @@ import {WorkDay} from '../shared/models/work-day';
 @Component({
   selector: 'app-history',
   templateUrl: './history.component.html',
-  styleUrls: ['./history.component.css']
+  styleUrls: ['./history.component.scss']
 })
 export class HistoryComponent {
 
