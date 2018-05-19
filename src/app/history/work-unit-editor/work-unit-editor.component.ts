@@ -65,7 +65,7 @@ export class WorkUnitEditorComponent implements OnChanges, OnDestroy {
 
   private static invalidTimeValidator(): ValidatorFn {
     return (control: AbstractControl): { [key: string]: any } => {
-      if (control.value === '') {
+      if (!control.value) {
         return null;
       }
 
@@ -84,9 +84,9 @@ export class WorkUnitEditorComponent implements OnChanges, OnDestroy {
     }
 
     return {
-      startTime: safeFormatLocalTime(dataModel.startTime, this.FORM_24_HOUR_LOCAL_TIME),
-      endTime: safeFormatLocalTime(dataModel.endTime, this.FORM_24_HOUR_LOCAL_TIME),
-      breakTime: safeFormatLocalTime(dataModel.breakTime, this.FORM_24_HOUR_LOCAL_TIME)
+      startTime: safeFormatLocalTime(dataModel.startTime, this.FORM_24_HOUR_LOCAL_TIME) || '',
+      endTime: safeFormatLocalTime(dataModel.endTime, this.FORM_24_HOUR_LOCAL_TIME) || '',
+      breakTime: safeFormatLocalTime(dataModel.breakTime, this.FORM_24_HOUR_LOCAL_TIME) || ''
     };
   }
 
