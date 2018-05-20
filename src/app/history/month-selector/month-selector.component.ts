@@ -1,4 +1,4 @@
-import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
+import {Component, EventEmitter, Input, OnChanges, Output} from '@angular/core';
 import {DateTimeFormatter, LocalDate} from 'js-joda';
 
 @Component({
@@ -6,12 +6,12 @@ import {DateTimeFormatter, LocalDate} from 'js-joda';
   templateUrl: './month-selector.component.html',
   styleUrls: ['./month-selector.component.css']
 })
-export class MonthSelectorComponent implements OnInit {
+export class MonthSelectorComponent implements OnChanges {
 
   monthFormat = DateTimeFormatter.ofPattern('MM/yyyy');
 
-  @Input('initialMonth')
-  initialMonth: LocalDate;
+  @Input('month')
+  month: LocalDate;
 
   @Output('monthChange')
   monthChange = new EventEmitter<LocalDate>();
@@ -21,8 +21,10 @@ export class MonthSelectorComponent implements OnInit {
   constructor() {
   }
 
-  ngOnInit() {
-    this._month = this.initialMonth.withDayOfMonth(1);
+  ngOnChanges(changes) {
+    if (changes.month) {
+      this.handleMonthChanged(changes.month.currentValue);
+    }
   }
 
   incrementMonth() {
@@ -33,5 +35,18 @@ export class MonthSelectorComponent implements OnInit {
   decrementMonth() {
     this._month = this._month.minusMonths(1);
     this.monthChange.emit(this._month);
+  }
+
+  private handleMonthChanged(month: LocalDate) {
+    if (!month) {
+      return;
+    }
+
+    const currentMonth = this._month;
+    const updatedMonth = month.withDayOfMonth(1);
+
+    if (!(currentMonth ? currentMonth.isEqual(updatedMonth) : currentMonth === updatedMonth)) {
+      this._month = updatedMonth;
+    }
   }
 }

@@ -67,4 +67,20 @@ export class WorkDayService {
 
     return of(newWorkDay);
   }
+
+  public removeWorkDay(workDayToRemove: WorkDay): Observable<WorkDay> {
+    const workDays: WorkDay[] = WorkDayService.readFromLocalStorage();
+
+    // Validate remove operation is allowed
+    const existingWorkDay = workDays.find(workDay => workDay.date.isEqual(workDayToRemove.date));
+    if (!existingWorkDay) {
+      return _throw({message: 'Unable to remove work day. There is no work day saved for this date.'});
+    }
+
+    const updatedWorkDays = workDays
+      .filter(workDay => !workDay.date.isEqual(workDayToRemove.date));
+    WorkDayService.writeToLocalStorage(updatedWorkDays);
+
+    return of(workDayToRemove);
+  }
 }

@@ -30,4 +30,18 @@ export class WorkUnit {
       breakTime: safeFormatLocalTime(workUnit.breakTime)
     };
   }
+
+  static isEqual(wu1: WorkUnit, wu2: WorkUnit) {
+    if (wu1) {
+      if (wu2) {
+        return (wu1.startTime ? wu1.startTime.equals(wu2.startTime) : wu1.startTime === wu2.startTime) &&
+          (wu1.endTime ? wu1.endTime.equals(wu2.endTime) : wu1.endTime === wu2.endTime) &&
+          (wu1.breakTime ? wu1.breakTime.equals(wu2.breakTime) : wu1.breakTime === wu2.breakTime);
+      } else {
+        return false;
+      }
+    } else {
+      return wu1 === wu2;
+    }
+  }
 }

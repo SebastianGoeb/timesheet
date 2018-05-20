@@ -1,6 +1,7 @@
 import {Component, EventEmitter, Input, OnChanges, OnDestroy, Output} from '@angular/core';
 import {AbstractControl, FormBuilder, FormGroup, ValidatorFn} from '@angular/forms';
 import {Subscription} from 'rxjs/Subscription';
+import {isEqual} from 'lodash';
 import {DateTimeFormatter, LocalTime} from 'js-joda';
 
 import {WorkUnit} from '../../shared/models/work-unit';
@@ -46,7 +47,7 @@ export class WorkUnitEditorComponent implements OnChanges, OnDestroy {
     // Push model changes to outside
     this.formChangeSubscription = this.form.valueChanges.subscribe(viewModel => {
       if (this.form.status === 'VALID') {
-        this.workUnitChange.emit(WorkUnitEditorComponent.buildDataModel(viewModel));
+        this.handleFormValueChanged(viewModel);
       }
     });
   }
@@ -108,13 +109,34 @@ export class WorkUnitEditorComponent implements OnChanges, OnDestroy {
     return result;
   }
 
-  // Data model changes
   ngOnChanges(changes) {
-    this.form.setValue(WorkUnitEditorComponent.buildViewModel(this.workUnit));
+    if (changes.workUnit) {
+      this.handleWorkUnitChanged(changes.workUnit.currentValue);
+    }
   }
 
   // Cleanup observables
   ngOnDestroy() {
     this.formChangeSubscription.unsubscribe();
+  }
+
+  // Potential data model changes
+  private handleWorkUnitChanged(workUnit) {
+    const currentViewModel = this.form.value;
+    const updatedViewModel = WorkUnitEditorComponent.buildViewModel(workUnit);
+
+    if (!isEqual(currentViewModel, updatedViewModel)) {
+      this.form.setValue(updatedViewModel);
+    }
+  }
+
+  // Potential view model changes
+  private handleFormValueChanged(formValue) {
+    const currentDataModel = this.workUnit;
+    const updatedDataModel = WorkUnitEditorComponent.buildDataModel(formValue);
+
+    if (!WorkUnit.isEqual(currentDataModel, updatedDataModel)) {
+      this.workUnitChange.emit(updatedDataModel);
+    }
   }
 }

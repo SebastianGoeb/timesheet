@@ -31,4 +31,17 @@ export class WorkDay {
   static ofDate(date: LocalDate) {
     return Object.assign(new WorkDay(), {date});
   }
+
+  static isEqual(wd1: WorkDay, wd2: WorkDay) {
+    if (wd1) {
+      if (wd2) {
+        return (wd1.date ? wd1.date.isEqual(wd2.date) : wd1.date === wd2.date) &&
+          WorkUnit.isEqual(wd1.workUnit, wd2.workUnit);
+      } else {
+        return false;
+      }
+    } else {
+      return wd1 === wd2;
+    }
+  }
 }

@@ -1,4 +1,4 @@
-import {Component} from '@angular/core';
+import {Component, OnChanges} from '@angular/core';
 import {range} from 'lodash';
 import {ChronoField, LocalDate} from 'js-joda';
 import {WorkDayStore} from '../shared/services/work-unit/work-day.store';
@@ -11,14 +11,16 @@ import {WorkDay} from '../shared/models/work-day';
   templateUrl: './history.component.html',
   styleUrls: ['./history.component.scss']
 })
-export class HistoryComponent {
+export class HistoryComponent implements OnChanges {
 
   // Data model
   month: LocalDate;
+  // Data model
   workDaysInMonth: WorkDay[];
 
   constructor(private workDayStore: WorkDayStore) {
-    this.monthChange(LocalDate.now().withDayOfMonth(1));
+    this.month = LocalDate.now();
+    this.handleMonthChanged(this.month.withDayOfMonth(1));
   }
 
   private static datesInMonth(month: LocalDate): LocalDate[] {
@@ -34,27 +36,41 @@ export class HistoryComponent {
     });
   }
 
-  monthChange(month: LocalDate) {
-    this.month = month;
+  handleMonthChanged(month: LocalDate) {
+    const currentMonth = this.month;
+    const updatedMonth = month;
 
-    this.workDayStore.getAll().subscribe(allWorkDays => {
-      this.workDaysInMonth = HistoryComponent.workDaysInMonth(this.month, allWorkDays);
-    });
+    if (!(currentMonth ? currentMonth.isEqual(updatedMonth) : currentMonth === updatedMonth)) {
+      this.workDayStore.getAll().subscribe(allWorkDays => {
+        this.workDaysInMonth = HistoryComponent.workDaysInMonth(month, allWorkDays);
+      });
+    }
   }
 
-  workUnitChange(existingWorkDay: WorkDay, newWorkUnit: WorkUnit) {
-    const existingWorkUnit = existingWorkDay.workUnit;
+  handleWorkUnitChanged(currentWorkDay: WorkDay, updatedWorkUnit: WorkUnit) {
+    const currentWorkUnit = currentWorkDay.workUnit;
 
-    if (newWorkUnit) {
-      if (existingWorkUnit) {
-        const newWorkDay = {date: existingWorkDay.date, workUnit: newWorkUnit};
-        this.workDayStore.updateWorkDay(newWorkDay);
+    if (updatedWorkUnit) {
+      if (currentWorkUnit) {
+        if (!WorkUnit.isEqual(currentWorkUnit, updatedWorkUnit)) {
+          this.workDayStore.updateWorkDay({date: currentWorkDay.date, workUnit: updatedWorkUnit})
+            .subscribe(workDay => setTimeout(() => currentWorkDay.workUnit = workDay.workUnit));
+        }
       } else {
-        const newWorkDay = {date: existingWorkDay.date, workUnit: newWorkUnit};
-        this.workDayStore.addWorkDay(newWorkDay);
+        this.workDayStore.addWorkDay({date: currentWorkDay.date, workUnit: updatedWorkUnit})
+          .subscribe(workDay => setTimeout(() => currentWorkDay.workUnit = workDay.workUnit));
       }
     } else {
-      console.log('Skipping null work units for now.');
+      if (currentWorkUnit) {
+        this.workDayStore.removeWorkDay(currentWorkDay)
+          .subscribe(() => setTimeout(() => currentWorkDay.workUnit = null));
+      } else {
+        // Do nothing
+      }
     }
+  }
+
+  ngOnChanges(changes) {
+    console.log('HistoryComponent changes: ', JSON.stringify(changes, null, 2));
   }
 }

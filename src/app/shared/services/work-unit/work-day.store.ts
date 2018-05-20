@@ -54,4 +54,18 @@ export class WorkDayStore {
 
     return obs;
   }
+
+  public removeWorkDay(workDayToRemove: WorkDay):  Observable<WorkDay> {
+    const obs: Observable<WorkDay> = this.workDayService.removeWorkDay(workDayToRemove);
+
+    obs.subscribe(
+      removedWorkDay => {
+        const updatedWorkDays = this._workDays.getValue()
+          .filter(workDay => !workDay.date.isEqual(removedWorkDay.date));
+        this._workDays.next(updatedWorkDays);
+      },
+      err => console.warn(err.message));
+
+    return obs;
+  }
 }
