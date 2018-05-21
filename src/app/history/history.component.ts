@@ -4,7 +4,9 @@ import {ChronoField, LocalDate} from 'js-joda';
 import {WorkDayStore} from '../shared/services/work-unit/work-day.store';
 import {WorkUnit} from '../shared/models/work-unit';
 import {WorkDay} from '../shared/models/work-day';
+import {safeEquals} from '../shared/utils/misc';
 
+// TODO split this into two components: a container and a list view
 
 @Component({
   selector: 'app-history',
@@ -32,7 +34,7 @@ export class HistoryComponent implements OnChanges {
   private static workDaysInMonth(month: LocalDate, allWorkDays: WorkDay[]): WorkDay[] {
     const datesInMonth = HistoryComponent.datesInMonth(month);
     return datesInMonth.map(date => {
-      return allWorkDays.find(workDay => workDay.date.isEqual(date)) || WorkDay.ofDate(date);
+      return allWorkDays.find(workDay => workDay.date.equals(date)) || WorkDay.ofDate(date);
     });
   }
 
@@ -40,7 +42,7 @@ export class HistoryComponent implements OnChanges {
     const currentMonth = this.month;
     const updatedMonth = month;
 
-    if (!(currentMonth ? currentMonth.isEqual(updatedMonth) : currentMonth === updatedMonth)) {
+    if (!safeEquals(currentMonth, updatedMonth)) {
       this.workDayStore.getAll().subscribe(allWorkDays => {
         this.workDaysInMonth = HistoryComponent.workDaysInMonth(month, allWorkDays);
       });
@@ -52,18 +54,24 @@ export class HistoryComponent implements OnChanges {
 
     if (updatedWorkUnit) {
       if (currentWorkUnit) {
-        if (!WorkUnit.isEqual(currentWorkUnit, updatedWorkUnit)) {
-          this.workDayStore.updateWorkDay({date: currentWorkDay.date, workUnit: updatedWorkUnit})
+        if (!safeEquals(currentWorkUnit, updatedWorkUnit)) {
+          this.workDayStore.updateWorkDay(Object.assign(new WorkDay(), {
+            date: currentWorkDay.date,
+            workUnit: updatedWorkUnit
+          }))
             .subscribe(workDay => setTimeout(() => currentWorkDay.workUnit = workDay.workUnit));
         }
       } else {
-        this.workDayStore.addWorkDay({date: currentWorkDay.date, workUnit: updatedWorkUnit})
+        this.workDayStore.addWorkDay(Object.assign(new WorkDay(), {
+          date: currentWorkDay.date,
+          workUnit: updatedWorkUnit
+        }))
           .subscribe(workDay => setTimeout(() => currentWorkDay.workUnit = workDay.workUnit));
       }
     } else {
       if (currentWorkUnit) {
         this.workDayStore.removeWorkDay(currentWorkDay)
-          .subscribe(() => setTimeout(() => currentWorkDay.workUnit = null));
+          .subscribe(() => setTimeout(() => currentWorkDay.workUnit = undefined));
       } else {
         // Do nothing
       }
@@ -71,6 +79,6 @@ export class HistoryComponent implements OnChanges {
   }
 
   ngOnChanges(changes) {
-    console.log('HistoryComponent changes: ', JSON.stringify(changes, null, 2));
+    console.log('HistoryComponent changes: ', JSON.stringify(changes, undefined, 2));
   }
 }

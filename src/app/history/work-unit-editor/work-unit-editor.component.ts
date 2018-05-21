@@ -6,6 +6,7 @@ import {DateTimeFormatter, LocalTime} from 'js-joda';
 
 import {WorkUnit} from '../../shared/models/work-unit';
 import {safeFormatLocalTime, safeParseLocalTime} from '../../shared/utils/date-time-utils';
+import {safeEquals} from '../../shared/utils/misc';
 
 class StringifiedWorkUnit {
   startTime = '';
@@ -29,11 +30,9 @@ export class WorkUnitEditorComponent implements OnChanges, OnDestroy {
   // Contains view model
   form: FormGroup;
 
-  // Push view model changes to outside
   @Output('workUnitChange')
   workUnitChange = new EventEmitter<WorkUnit>();
 
-  // Avoid memory leaks. Clean up long-running subscriptions
   formChangeSubscription: Subscription;
 
   constructor(private fb: FormBuilder) {
@@ -66,7 +65,7 @@ export class WorkUnitEditorComponent implements OnChanges, OnDestroy {
 
   private static invalidTimeValidator(): ValidatorFn {
     return (control: AbstractControl): { [key: string]: any } => {
-      if (!control.value) {
+      if (control.value === '') {
         return null;
       }
 
@@ -80,7 +79,7 @@ export class WorkUnitEditorComponent implements OnChanges, OnDestroy {
   }
 
   private static buildViewModel(dataModel: WorkUnit): StringifiedWorkUnit {
-    if (!dataModel) {
+    if (dataModel == undefined) {
       return new StringifiedWorkUnit();
     }
 
@@ -92,21 +91,21 @@ export class WorkUnitEditorComponent implements OnChanges, OnDestroy {
   }
 
   private static buildDataModel(viewModel: StringifiedWorkUnit): WorkUnit {
-    if (!viewModel) {
-      return null;
+    if (viewModel == undefined) {
+      return undefined;
     }
 
-    const result = {
+    if (viewModel.startTime === '' &&
+      viewModel.endTime === '' &&
+      viewModel.breakTime === '') {
+      return undefined;
+    }
+
+    return Object.assign(new WorkUnit(), {
       startTime: safeParseLocalTime(viewModel.startTime, this.FORM_24_HOUR_LOCAL_TIME),
       endTime: safeParseLocalTime(viewModel.endTime, this.FORM_24_HOUR_LOCAL_TIME),
       breakTime: safeParseLocalTime(viewModel.breakTime, this.FORM_24_HOUR_LOCAL_TIME)
-    };
-
-    if (!result.startTime && !result.endTime && !result.breakTime) {
-      return null;
-    }
-
-    return result;
+    });
   }
 
   ngOnChanges(changes) {
@@ -115,7 +114,7 @@ export class WorkUnitEditorComponent implements OnChanges, OnDestroy {
     }
   }
 
-  // Cleanup observables
+  // Avoid memory leaks. Clean up long-running subscriptions
   ngOnDestroy() {
     this.formChangeSubscription.unsubscribe();
   }
@@ -135,7 +134,7 @@ export class WorkUnitEditorComponent implements OnChanges, OnDestroy {
     const currentDataModel = this.workUnit;
     const updatedDataModel = WorkUnitEditorComponent.buildDataModel(formValue);
 
-    if (!WorkUnit.isEqual(currentDataModel, updatedDataModel)) {
+    if (!safeEquals(currentDataModel, updatedDataModel)) {
       this.workUnitChange.emit(updatedDataModel);
     }
   }

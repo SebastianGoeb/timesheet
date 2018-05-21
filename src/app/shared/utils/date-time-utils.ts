@@ -4,7 +4,7 @@ export function safeParseLocalDate(string: string, formatter?: DateTimeFormatter
   try {
     return LocalDate.parse(string, formatter);
   } catch (e) {
-    return null; // default
+    return undefined; // default
   }
 }
 
@@ -12,7 +12,7 @@ export function safeFormatLocalDate(localDate: LocalDate, formatter?: DateTimeFo
   try {
     return localDate.format(formatter || DateTimeFormatter.ISO_LOCAL_DATE);
   } catch (e) {
-    return null; // default
+    return undefined; // default
   }
 }
 
@@ -20,7 +20,7 @@ export function safeParseLocalTime(string: string, formatter?: DateTimeFormatter
   try {
     return LocalTime.parse(string, formatter);
   } catch (e) {
-    return null; // default
+    return undefined; // default
   }
 }
 
@@ -28,6 +28,6 @@ export function safeFormatLocalTime(localTime: LocalTime, formatter?: DateTimeFo
   try {
     return localTime.format(formatter || DateTimeFormatter.ISO_LOCAL_TIME);
   } catch (e) {
-    return null; // default
+    return undefined; // default
   }
 }

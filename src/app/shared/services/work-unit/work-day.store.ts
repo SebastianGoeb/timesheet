@@ -47,7 +47,7 @@ export class WorkDayStore {
     obs.subscribe(
       savedWorkDay => {
         const updatedWorkDays = this._workDays.getValue()
-          .map(workDay => workDay.date.isEqual(savedWorkDay.date) ? savedWorkDay : workDay);
+          .map(workDay => workDay.date.equals(savedWorkDay.date) ? savedWorkDay : workDay);
         this._workDays.next(updatedWorkDays);
       },
       err => console.warn(err.message));
@@ -61,7 +61,7 @@ export class WorkDayStore {
     obs.subscribe(
       removedWorkDay => {
         const updatedWorkDays = this._workDays.getValue()
-          .filter(workDay => !workDay.date.isEqual(removedWorkDay.date));
+          .filter(workDay => !workDay.date.equals(removedWorkDay.date));
         this._workDays.next(updatedWorkDays);
       },
       err => console.warn(err.message));

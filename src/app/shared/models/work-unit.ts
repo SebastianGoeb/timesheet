@@ -1,27 +1,29 @@
 import {LocalTime} from 'js-joda';
 import {safeFormatLocalTime, safeParseLocalTime} from '../utils/date-time-utils';
+import {safeEquals} from '../utils/misc';
+import {Equatable} from '../utils/equatable';
 
-export class WorkUnit {
+export class WorkUnit implements Equatable {
 
-  public startTime: LocalTime = null;
-  public endTime: LocalTime = null;
-  public breakTime: LocalTime = null;
+  public startTime?: LocalTime;
+  public endTime?: LocalTime;
+  public breakTime?: LocalTime;
 
-  static fromJSON(workUnit: any): WorkUnit {
-    if (!workUnit) {
-      return null;
+  static fromJSON(json: any): WorkUnit {
+    if (json == undefined) {
+      return undefined;
     }
 
-    return {
-      startTime: safeParseLocalTime(workUnit.startTime),
-      endTime: safeParseLocalTime(workUnit.endTime),
-      breakTime: safeParseLocalTime(workUnit.breakTime)
-    };
+    return Object.assign(new WorkUnit(), {
+      startTime: safeParseLocalTime(json.startTime),
+      endTime: safeParseLocalTime(json.endTime),
+      breakTime: safeParseLocalTime(json.breakTime)
+    });
   }
 
   public static toJSON(workUnit: WorkUnit) {
-    if (!workUnit) {
-      return null;
+    if (workUnit == undefined) {
+      return undefined;
     }
 
     return {
@@ -31,17 +33,17 @@ export class WorkUnit {
     };
   }
 
-  static isEqual(wu1: WorkUnit, wu2: WorkUnit) {
-    if (wu1) {
-      if (wu2) {
-        return (wu1.startTime ? wu1.startTime.equals(wu2.startTime) : wu1.startTime === wu2.startTime) &&
-          (wu1.endTime ? wu1.endTime.equals(wu2.endTime) : wu1.endTime === wu2.endTime) &&
-          (wu1.breakTime ? wu1.breakTime.equals(wu2.breakTime) : wu1.breakTime === wu2.breakTime);
-      } else {
-        return false;
-      }
-    } else {
-      return wu1 === wu2;
+  public equals(that: Equatable): boolean {
+    if (this === that) {
+      return true;
     }
+
+    if (that instanceof WorkUnit) {
+      return safeEquals(this.startTime, that.startTime) &&
+        safeEquals(this.endTime, that.endTime) &&
+        safeEquals(this.breakTime, that.breakTime);
+    }
+
+    return false;
   }
 }

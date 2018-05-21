@@ -16,7 +16,7 @@ export class WorkDayService {
   private static readFromLocalStorage(): WorkDay[] {
     const jsonString = localStorage.getItem(KEY_WORK_UNITS);
 
-    if (!jsonString) {
+    if (jsonString == undefined) {
       return [];
     }
 
@@ -41,7 +41,7 @@ export class WorkDayService {
     const workDays = WorkDayService.readFromLocalStorage();
 
     // Validate add operation is allowed
-    const existingWorkDay = workDays.find(workDay => workDay.date.isEqual(newWorkDay.date));
+    const existingWorkDay = workDays.find(workDay => workDay.date.equals(newWorkDay.date));
     if (existingWorkDay) {
       return _throw({message: 'Unable to add work day. There is already a work day saved for this date. Update existing work day instead.'});
     }
@@ -56,13 +56,13 @@ export class WorkDayService {
     const workDays: WorkDay[] = WorkDayService.readFromLocalStorage();
 
     // Validate update operation is allowed
-    const existingWorkDay = workDays.find(workDay => workDay.date.isEqual(newWorkDay.date));
-    if (!existingWorkDay) {
+    const existingWorkDay = workDays.find(workDay => workDay.date.equals(newWorkDay.date));
+    if (existingWorkDay == undefined) {
       return _throw({message: 'Unable to update work day. There is no work day saved for this date. Add work day instead.'});
     }
 
     const updatedWorkDays = workDays
-      .map(workDay => workDay.date.isEqual(newWorkDay.date) ? newWorkDay : workDay);
+      .map(workDay => workDay.date.equals(newWorkDay.date) ? newWorkDay : workDay);
     WorkDayService.writeToLocalStorage(updatedWorkDays);
 
     return of(newWorkDay);
@@ -72,13 +72,13 @@ export class WorkDayService {
     const workDays: WorkDay[] = WorkDayService.readFromLocalStorage();
 
     // Validate remove operation is allowed
-    const existingWorkDay = workDays.find(workDay => workDay.date.isEqual(workDayToRemove.date));
-    if (!existingWorkDay) {
+    const existingWorkDay = workDays.find(workDay => workDay.date.equals(workDayToRemove.date));
+    if (existingWorkDay == undefined) {
       return _throw({message: 'Unable to remove work day. There is no work day saved for this date.'});
     }
 
     const updatedWorkDays = workDays
-      .filter(workDay => !workDay.date.isEqual(workDayToRemove.date));
+      .filter(workDay => !workDay.date.equals(workDayToRemove.date));
     WorkDayService.writeToLocalStorage(updatedWorkDays);
 
     return of(workDayToRemove);

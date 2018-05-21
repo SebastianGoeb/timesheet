@@ -1,5 +1,6 @@
 import {Component, EventEmitter, Input, OnChanges, Output} from '@angular/core';
 import {DateTimeFormatter, LocalDate} from 'js-joda';
+import {safeEquals} from '../../shared/utils/misc';
 
 @Component({
   selector: 'app-month-selector',
@@ -23,7 +24,7 @@ export class MonthSelectorComponent implements OnChanges {
 
   ngOnChanges(changes) {
     if (changes.month) {
-      this.handleMonthChanged(changes.month.currentValue);
+      this.handleDataModelChanged(changes.month.currentValue);
     }
   }
 
@@ -37,15 +38,15 @@ export class MonthSelectorComponent implements OnChanges {
     this.monthChange.emit(this._month);
   }
 
-  private handleMonthChanged(month: LocalDate) {
-    if (!month) {
+  private handleDataModelChanged(month: LocalDate) {
+    if (month == undefined) {
       return;
     }
 
     const currentMonth = this._month;
     const updatedMonth = month.withDayOfMonth(1);
 
-    if (!(currentMonth ? currentMonth.isEqual(updatedMonth) : currentMonth === updatedMonth)) {
+    if (!safeEquals(currentMonth, updatedMonth)) {
       this._month = updatedMonth;
     }
   }
