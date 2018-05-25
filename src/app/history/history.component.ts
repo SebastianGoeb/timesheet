@@ -1,72 +1,84 @@
-import {Component, OnInit} from '@angular/core';
-import {combineLatest, map, tap} from "rxjs/operators";
-import {WorkUnit} from "../shared/models/work-unit";
-import {Observable} from "rxjs/Observable";
-import {WorkUnitStore} from "../shared/services/work-unit/work-unit.store";
-import {BehaviorSubject} from "rxjs/BehaviorSubject";
-import * as moment from "moment";
-import * as _ from "lodash";
+import {Component, OnChanges} from '@angular/core';
+import {range} from 'lodash';
+import {ChronoField, LocalDate} from 'js-joda';
+import {WorkDayStore} from '../shared/services/work-unit/work-day.store';
+import {WorkUnit} from '../shared/models/work-unit';
+import {WorkDay} from '../shared/models/work-day';
+import {safeEquals} from '../shared/utils/misc';
 
-class DateInfo {
-  date: moment.Moment;
-  workUnit: WorkUnit;
-}
+// TODO split this into two components: a container and a list view
 
 @Component({
   selector: 'app-history',
   templateUrl: './history.component.html',
-  styleUrls: ['./history.component.css']
+  styleUrls: ['./history.component.scss']
 })
-export class HistoryComponent implements OnInit {
+export class HistoryComponent implements OnChanges {
 
-  month = new BehaviorSubject<moment.Moment>(moment().startOf('month'));
+  // Data model
+  month: LocalDate;
+  // Data model
+  workDaysInMonth: WorkDay[];
 
-  datesInMonth: Observable<moment.Moment[]>;
+  constructor(private workDayStore: WorkDayStore) {
+    this.month = LocalDate.now();
+    this.handleMonthChanged(this.month.withDayOfMonth(1));
+  }
 
-  dateInfos: Observable<DateInfo[]>;
+  private static datesInMonth(month: LocalDate): LocalDate[] {
+    const daysOfMonth = month.range(ChronoField.DAY_OF_MONTH);
+    return range(daysOfMonth.minimum(), daysOfMonth.maximum() + 1)
+      .map(dayOfMonth => month.withDayOfMonth(dayOfMonth));
+  }
 
-  constructor(private workUnitStore: WorkUnitStore) {
-    this.datesInMonth = this.month.pipe(map(month => HistoryComponent.datesInMonth(month)));
+  private static workDaysInMonth(month: LocalDate, allWorkDays: WorkDay[]): WorkDay[] {
+    const datesInMonth = HistoryComponent.datesInMonth(month);
+    return datesInMonth.map(date => {
+      return allWorkDays.find(workDay => workDay.date.equals(date)) || WorkDay.ofDate(date);
+    });
+  }
 
-    // Make a work unit for each date
-    this.dateInfos = this.workUnitStore.workUnits$.pipe(
-      combineLatest(this.datesInMonth, (workUnits, datesInMonth) => ({workUnits, datesInMonth})),
-      map(({workUnits, datesInMonth}) => {
-        return datesInMonth.map(date => {
-          const workUnit = workUnits.find(workUnit => workUnit.date.isSame(date));
-          return {date, workUnit: workUnit || {date}};
-        });
-      }),
-      tap((dateInfos: DateInfo[]) => {
-        for (let dateInfo of dateInfos) {
-          console.log(dateInfo.date.format(), dateInfo.workUnit);
+  handleMonthChanged(month: LocalDate) {
+    const currentMonth = this.month;
+    const updatedMonth = month;
+
+    if (!safeEquals(currentMonth, updatedMonth)) {
+      this.workDayStore.getAll().subscribe(allWorkDays => {
+        this.workDaysInMonth = HistoryComponent.workDaysInMonth(month, allWorkDays);
+      });
+    }
+  }
+
+  handleWorkUnitChanged(currentWorkDay: WorkDay, updatedWorkUnit: WorkUnit) {
+    const currentWorkUnit = currentWorkDay.workUnit;
+
+    if (updatedWorkUnit) {
+      if (currentWorkUnit) {
+        if (!safeEquals(currentWorkUnit, updatedWorkUnit)) {
+          this.workDayStore.updateWorkDay(Object.assign(new WorkDay(), {
+            date: currentWorkDay.date,
+            workUnit: updatedWorkUnit
+          }))
+            .subscribe(workDay => setTimeout(() => currentWorkDay.workUnit = workDay.workUnit));
         }
-      })
-    );
-  }
-
-  private static datesInMonth(month: moment.Moment): moment.Moment[] {
-    const startDate = moment(month).startOf('month').startOf('day');
-    const endDate = moment(month).endOf('month').startOf('day');
-
-    const days = moment.duration(endDate.diff(startDate)).asDays();
-    return _.range(0, days).map(n => moment(startDate).add(n, 'days'))
-  }
-
-  ngOnInit() {
-  }
-
-  onUpdate(previousWorkUnit: WorkUnit, workUnit: WorkUnit) {
-    if (workUnit.start || workUnit.end || workUnit.breakDuration) {
-      if (previousWorkUnit.start || previousWorkUnit.end || previousWorkUnit.breakDuration) {
-        this.workUnitStore.updateWorkUnit(workUnit);
       } else {
-        this.workUnitStore.addWorkUnit(workUnit);
+        this.workDayStore.addWorkDay(Object.assign(new WorkDay(), {
+          date: currentWorkDay.date,
+          workUnit: updatedWorkUnit
+        }))
+          .subscribe(workDay => setTimeout(() => currentWorkDay.workUnit = workDay.workUnit));
+      }
+    } else {
+      if (currentWorkUnit) {
+        this.workDayStore.removeWorkDay(currentWorkDay)
+          .subscribe(() => setTimeout(() => currentWorkDay.workUnit = undefined));
+      } else {
+        // Do nothing
       }
     }
   }
 
-  updateMonth($event: moment.Moment) {
-    this.month.next($event);
+  ngOnChanges(changes) {
+    console.log('HistoryComponent changes: ', JSON.stringify(changes, undefined, 2));
   }
 }

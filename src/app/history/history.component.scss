@@ -1,0 +1,10 @@
+.history-row {
+  display: flex;
+  flex-flow: row nowrap;
+
+  .day-of-month {
+    width: 1.5rem;
+    text-align: right;
+    padding-right: 0.5rem;
+  }
+}

@@ -1,11 +1,9 @@
-<app-month-selector [initialMonth]="month.getValue()" (update)="updateMonth($event)"></app-month-selector>
+<app-month-selector [month]="month" (monthChange)="handleMonthChanged($event)"></app-month-selector>
 
 <br/>
 
-<div *ngFor="let dateInfo of dateInfos | async">
-  {{dateInfo.workUnit.date.format('D')}}
-  <app-work-unit-editor
-    [date]="dateInfo.date"
-    [workUnit]="dateInfo.workUnit"
-    (update)="onUpdate(dateInfo.workUnit, $event);"></app-work-unit-editor>
+<div *ngFor="let workDay of workDaysInMonth" class="history-row">
+  <span class="day-of-month">{{workDay.date.dayOfMonth()}}:</span>
+  <app-work-unit-editor [workUnit]="workDay.workUnit"
+                        (workUnitChange)="handleWorkUnitChanged(workDay, $event)"></app-work-unit-editor>
 </div>
