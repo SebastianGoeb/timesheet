@@ -1,13 +1,11 @@
-<form [formGroup]="form">
-  <label [ngClass]="{'has-error': startTime.errors}">
-    <input formControlName="startTime">
-  </label>
-
-  <label [ngClass]="{'has-error': endTime.errors}">
-    <input formControlName="endTime">
-  </label>
-
-  <label [ngClass]="{'has-error': breakTime.errors}">
-    <input formControlName="breakTime">
-  </label>
+<form [formGroup]="form" class="work-unit-form">
+  <mat-form-field class="work-unit-form-field">
+    <input matInput type="text" formControlName="startTime">
+  </mat-form-field>
+  <mat-form-field class="work-unit-form-field">
+    <input matInput type="text" formControlName="endTime">
+  </mat-form-field>
+  <mat-form-field class="work-unit-form-field">
+    <input matInput type="text" formControlName="breakTime">
+  </mat-form-field>
 </form>

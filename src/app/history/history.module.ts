@@ -6,6 +6,7 @@ import {WorkDayService} from '../shared/services/work-unit/work-day.service';
 import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {WorkUnitEditorComponent} from './work-unit-editor/work-unit-editor.component';
 import {MonthSelectorComponent} from './month-selector/month-selector.component';
+import {MatButtonModule, MatDividerModule, MatInputModule, MatListModule} from '@angular/material';
 
 @NgModule({
   declarations: [
@@ -14,6 +15,10 @@ import {MonthSelectorComponent} from './month-selector/month-selector.component'
     MonthSelectorComponent
   ],
   imports: [
+    MatButtonModule,
+    MatInputModule,
+    MatDividerModule,
+    MatListModule,
     CommonModule,
     FormsModule,
     ReactiveFormsModule

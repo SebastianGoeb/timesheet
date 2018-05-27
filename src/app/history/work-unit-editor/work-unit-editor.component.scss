@@ -7,3 +7,12 @@
     color: red;
   }
 }
+
+.work-unit-form {
+  display: flex;
+  flex-flow: row nowrap;
+}
+
+.work-unit-form-field {
+  flex: 0 1 auto;
+}

@@ -2,8 +2,14 @@
 
 <br/>
 
-<div *ngFor="let workDay of workDaysInMonth" class="history-row">
-  <span class="day-of-month">{{workDay.date.dayOfMonth()}}:</span>
-  <app-work-unit-editor [workUnit]="workDay.workUnit"
-                        (workUnitChange)="handleWorkUnitChanged(workDay, $event)"></app-work-unit-editor>
-</div>
+<mat-list>
+  <mat-list-item *ngFor="let workDay of workDaysInMonth">
+    <div class="history-row">
+      <!--{{workDay.date.dayOfMonth()}}:-->
+      <span class="day-of-month">{{workDay.date.dayOfMonth()}}:</span>
+      <app-work-unit-editor [workUnit]="workDay.workUnit" class="history-entry"
+                            (workUnitChange)="handleWorkUnitChanged(workDay, $event)"></app-work-unit-editor>
+    </div>
+    <!--<mat-divider [inset]="true" *ngIf="!last"></mat-divider>-->
+  </mat-list-item>
+</mat-list>
