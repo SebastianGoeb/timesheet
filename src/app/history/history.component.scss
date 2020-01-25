@@ -1,20 +1,16 @@
-.history-row {
-  display: flex;
-  flex-flow: row nowrap;
-
-  .day-of-month {
-    align-self: center;
-    width: 2.5rem;
-    font-size: 150%;
-    text-align: right;
-    padding-right: 0.5rem;
-  }
+.container {
+  border: 1px dotted red;
 }
 
-.history-entry {
-  flex: 1 1 auto;
+.day-of-month {
+  align-self: center;
+  width: 2.5rem;
+  font-size: 150%;
+  text-align: right;
+  padding-right: 0.5rem;
 }
 
-mat-list {
-  width: 100%;
+.banana {
+  background: mediumslateblue;
+  height: 50vh;
 }

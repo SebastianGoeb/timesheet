@@ -1,5 +1,7 @@
-<h4 *ngIf="_month">
-  {{(_month).format(monthFormat)}}
-</h4>
-<button (click)="decrementMonth()"><</button>
-<button (click)="incrementMonth()">></button>
+<div class="container" fxLayout="row">
+  <h4 *ngIf="_month">
+    {{(_month).format(monthFormat)}}
+  </h4>
+  <button (click)="decrementMonth()"><</button>
+  <button (click)="incrementMonth()">></button>
+</div>

@@ -5,7 +5,7 @@ import {safeEquals} from '../../shared/utils/misc';
 @Component({
   selector: 'app-month-selector',
   templateUrl: './month-selector.component.html',
-  styleUrls: ['./month-selector.component.css']
+  styleUrls: ['./month-selector.component.scss']
 })
 export class MonthSelectorComponent implements OnChanges {
 

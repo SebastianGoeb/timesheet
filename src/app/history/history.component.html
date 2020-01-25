@@ -1,15 +1,12 @@
-<app-month-selector [month]="month" (monthChange)="handleMonthChanged($event)"></app-month-selector>
+<div class="container" fxLayout="column">
+  <app-month-selector [month]="month" (monthChange)="handleMonthChanged($event)"></app-month-selector>
 
-<br/>
-
-<mat-list>
-  <mat-list-item *ngFor="let workDay of workDaysInMonth">
-    <div class="history-row">
-      <!--{{workDay.date.dayOfMonth()}}:-->
-      <span class="day-of-month">{{workDay.date.dayOfMonth()}}:</span>
-      <app-work-unit-editor [workUnit]="workDay.workUnit" class="history-entry"
-                            (workUnitChange)="handleWorkUnitChanged(workDay, $event)"></app-work-unit-editor>
-    </div>
-    <!--<mat-divider [inset]="true" *ngIf="!last"></mat-divider>-->
-  </mat-list-item>
-</mat-list>
+  <div class="banana"></div>
+  <!--<mat-list fxLayout="column">-->
+    <!--<mat-list-item *ngFor="let workDay of workDaysInMonth">-->
+      <!--<span class="day-of-month">{{workDay.date.dayOfMonth()}}:</span>-->
+      <!--<app-work-unit-editor [workUnit]="workDay.workUnit" class="history-entry"-->
+                            <!--(workUnitChange)="handleWorkUnitChanged(workDay, $event)"></app-work-unit-editor>-->
+    <!--</mat-list-item>-->
+  <!--</mat-list>-->
+</div>
